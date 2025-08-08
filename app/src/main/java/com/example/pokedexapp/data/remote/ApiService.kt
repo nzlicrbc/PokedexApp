@@ -21,4 +21,10 @@ interface ApiService {
         @Header("Authorization") auth: String = "Bearer ${BuildConfig.UUID}",
         @Path("id") id: Int
     ): PokemonDetailResponse
+
+    @GET("pokemon/{name}")
+    suspend fun getPokemonDetailByName(
+        @Header("Authorization") auth: String = "Bearer ${BuildConfig.UUID}",
+        @Path("name") name: String
+    ): PokemonDetailResponse
 }

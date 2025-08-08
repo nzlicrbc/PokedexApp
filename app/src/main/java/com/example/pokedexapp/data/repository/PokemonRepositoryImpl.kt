@@ -1,14 +1,17 @@
 package com.example.pokedexapp.data.repository
 
-import retrofit2.HttpException
 import com.example.pokedexapp.data.remote.ApiService
 import com.example.pokedexapp.domain.model.Pokemon
 import com.example.pokedexapp.domain.model.PokemonDetail
 import com.example.pokedexapp.domain.model.PokemonStats
 import com.example.pokedexapp.domain.repository.PokemonRepository
 import com.example.pokedexapp.util.Resource
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
@@ -24,13 +27,31 @@ class PokemonRepositoryImpl @Inject constructor(
 
         try {
             val response = apiService.getPokemonList(limit = limit, offset = offset)
-            val pokemonList = response.results.map {pokemonResult ->
-                val id = pokemonResult.getPokemonId()
-                Pokemon(
-                    id = id,
-                    name = pokemonResult.name,
-                    imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png"
-                )
+
+            val pokemonList = coroutineScope {
+                response.results.map { pokemonResult ->
+                    async {
+                        try {
+                            val id = pokemonResult.getPokemonId()
+                            val detailResponse = apiService.getPokemonDetailById(id = id)
+                            Pokemon(
+                                id = id,
+                                name = pokemonResult.name,
+                                imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png",
+                                types = detailResponse.types.sortedBy { it.slot }
+                                    .map { it.type.name }
+                            )
+                        } catch (e: Exception) {
+                            val id = pokemonResult.getPokemonId()
+                            Pokemon(
+                                id = id,
+                                name = pokemonResult.name,
+                                imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png",
+                                types = emptyList()
+                            )
+                        }
+                    }
+                }.awaitAll()
             }
             emit(Resource.Success(pokemonList))
         } catch (e: HttpException) {
