@@ -49,7 +49,7 @@ fun PokemonListScreen(
         isLoading = isLoading,
         error = error,
         onPokemonClick = { pokemonId ->
-            navController.navigate("pokemonDetail/$pokemonId")
+            navController.navigate("pokemon_detail/$pokemonId")
         },
         onLoadMore = { viewModel.loadMorePokemons() },
         onRetry = { viewModel.loadPokemons() },
