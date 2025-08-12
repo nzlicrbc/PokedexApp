@@ -4,12 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -83,6 +88,15 @@ fun PokemonDetailScreen(
                         )
                     }
                 },
+
+                actions = {
+                    Text(
+                        text = "#${selectedPokemon?.id.toString().padStart(3, '0')}",
+                        fontSize = 18.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = typeColor
                 )
@@ -100,6 +114,7 @@ fun PokemonDetailScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
                 error != null -> {
                     Column(
                         modifier = Modifier
@@ -118,6 +133,7 @@ fun PokemonDetailScreen(
                         }
                     }
                 }
+
                 selectedPokemon != null -> {
                     PokemonDetailContent(
                         pokemonDetail = selectedPokemon,
@@ -134,6 +150,7 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(43, 41, 44))
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -175,44 +192,65 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
                     else it.toString()
                 },
                 fontSize = 32.sp,
+                color = Color.White,
                 fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "#${pokemonDetail.id.toString().padStart(3, '0')}",
-                fontSize = 18.sp,
-                color = Color.Gray
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "types: ${pokemonDetail.types.joinToString(", ")}",
-                fontSize = 16.sp
-            )
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                items(pokemonDetail.types) { type ->
+                    TypeBadge(typeName = type)
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "weight: ${pokemonDetail.weight}",
-                fontSize = 16.sp
-            )
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "${pokemonDetail.weight}",
+                        fontSize = 16.sp,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "weight",
+                        fontSize = 12.sp,
+                        color = Color.LightGray
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "height: ${pokemonDetail.height}",
-                fontSize = 16.sp
-            )
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "${pokemonDetail.height}",
+                        fontSize = 16.sp,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "height",
+                        fontSize = 12.sp,
+                        color = Color.LightGray
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "base stats",
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -220,28 +258,57 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
             val stats = pokemonDetail.stats
             Text(
                 text = "hp: ${stats.hp}",
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = Color.White
             )
             Text(
                 text = "attack: ${stats.attack}",
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = Color.White
             )
             Text(
                 text = "defense: ${stats.defense}",
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = Color.White
             )
             Text(
                 text = "speed: ${stats.speed}",
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = Color.White
             )
             Text(
                 text = "special attack: ${stats.specialAttack}",
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = Color.White
             )
             Text(
                 text = "special defense: ${stats.specialDefense}",
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = Color.White
             )
         }
+    }
+}
+
+@Composable
+fun TypeBadge(typeName: String) {
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .width(150.dp)
+            .background(
+                color = getTypeColor(typeName),
+                shape = RoundedCornerShape(24.dp)
+            )
+            .padding(vertical = 4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = typeName,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center
+        )
     }
 }
