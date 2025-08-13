@@ -27,12 +27,18 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -59,6 +65,9 @@ fun PokemonDetailScreen(
     val selectedPokemon = viewModel.selectedPokemon.value
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
+
+    val bottomSheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(pokemonId) {
         viewModel.getPokemonDetail(pokemonId)
@@ -140,16 +149,47 @@ fun PokemonDetailScreen(
                 selectedPokemon != null -> {
                     PokemonDetailContent(
                         pokemonDetail = selectedPokemon,
-                        topColor = typeColor
+                        topColor = typeColor,
+                        onShowBottomSheet = { showBottomSheet = true }
                     )
                 }
+            }
+        }
+    }
+
+    if(showBottomSheet && selectedPokemon != null) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            sheetState = bottomSheetState
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Base Stats",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                val stats = selectedPokemon.stats
+                Text(text = "HP: ${stats.hp}", fontSize = 16.sp, color = Color.Black)
+                Text(text = "Attack: ${stats.attack}", fontSize = 16.sp, color = Color.Black)
+                Text(text = "Defense: ${stats.defense}", fontSize = 16.sp, color = Color.Black)
+                Text(text = "Speed: ${stats.speed}", fontSize = 16.sp, color = Color.Black)
+                Text(text = "Special Attack: ${stats.specialAttack}", fontSize = 16.sp, color = Color.Black)
+                Text(text = "Special Defense: ${stats.specialDefense}", fontSize = 16.sp, color = Color.Black)
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 }
 
 @Composable
-fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
+fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color, onShowBottomSheet: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -251,7 +291,7 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
 
             Button(
                 onClick = {
-
+                    onShowBottomSheet()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
@@ -263,40 +303,6 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
                     color = Color.White
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val stats = pokemonDetail.stats
-            Text(
-                text = "hp: ${stats.hp}",
-                fontSize = 16.sp,
-                color = Color.White
-            )
-            Text(
-                text = "attack: ${stats.attack}",
-                fontSize = 16.sp,
-                color = Color.White
-            )
-            Text(
-                text = "defense: ${stats.defense}",
-                fontSize = 16.sp,
-                color = Color.White
-            )
-            Text(
-                text = "speed: ${stats.speed}",
-                fontSize = 16.sp,
-                color = Color.White
-            )
-            Text(
-                text = "special attack: ${stats.specialAttack}",
-                fontSize = 16.sp,
-                color = Color.White
-            )
-            Text(
-                text = "special defense: ${stats.specialDefense}",
-                fontSize = 16.sp,
-                color = Color.White
-            )
         }
     }
 }
