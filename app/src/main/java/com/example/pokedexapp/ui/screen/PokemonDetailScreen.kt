@@ -1,5 +1,6 @@
 package com.example.pokedexapp.ui.screen
 
+import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -157,7 +160,7 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp)
+                .height(200.dp)
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
@@ -196,7 +199,7 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -246,12 +249,20 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "base stats",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            Button(
+                onClick = {
+
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+            ) {
+                Text(
+                    text = "base stats",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
