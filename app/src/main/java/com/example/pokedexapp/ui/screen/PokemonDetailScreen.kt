@@ -1,6 +1,5 @@
 package com.example.pokedexapp.ui.screen
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,25 +19,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -51,8 +47,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.pokedexapp.domain.model.PokemonDetail
+import com.example.pokedexapp.ui.screen.components.StatBottomSheet
+import com.example.pokedexapp.ui.screen.components.TypeBadge
 import com.example.pokedexapp.ui.theme.getTypeColor
 import com.example.pokedexapp.viewmodel.PokemonViewModel
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,8 +65,16 @@ fun PokemonDetailScreen(
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
 
-    val bottomSheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        skipHiddenState = false
+    )
+
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = bottomSheetState
+    )
+
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(pokemonId) {
         viewModel.getPokemonDetail(pokemonId)
@@ -75,7 +82,12 @@ fun PokemonDetailScreen(
 
     val typeColor = getTypeColor(selectedPokemon?.types?.firstOrNull() ?: "normal")
 
-    Scaffold(
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = if (bottomSheetState.currentValue == SheetValue.Hidden) 0.dp else 200.dp,
+        sheetContainerColor = Color(43, 41, 44),
+        containerColor = Color(43, 41, 44),
+        sheetSwipeEnabled = bottomSheetState.currentValue != SheetValue.Hidden,
         topBar = {
             TopAppBar(
                 title = {
@@ -100,7 +112,6 @@ fun PokemonDetailScreen(
                         )
                     }
                 },
-
                 actions = {
                     Text(
                         text = "#${selectedPokemon?.id.toString().padStart(3, '0')}",
@@ -113,6 +124,14 @@ fun PokemonDetailScreen(
                     containerColor = typeColor
                 )
             )
+        },
+        sheetContent = {
+            if (selectedPokemon != null) {
+                StatBottomSheet(
+                    stats = selectedPokemon.stats,
+                    isExpanded = bottomSheetState.currentValue == SheetValue.Expanded
+                )
+            }
         }
     ) { innerPadding ->
         Box(
@@ -150,46 +169,36 @@ fun PokemonDetailScreen(
                     PokemonDetailContent(
                         pokemonDetail = selectedPokemon,
                         topColor = typeColor,
-                        onShowBottomSheet = { showBottomSheet = true }
+                        onStatsClick = {
+                            scope.launch {
+                                when (bottomSheetState.currentValue) {
+                                    SheetValue.Hidden -> {
+                                        bottomSheetState.partialExpand()
+                                    }
+
+                                    SheetValue.PartiallyExpanded -> {
+                                        bottomSheetState.expand()
+                                    }
+
+                                    SheetValue.Expanded -> {
+                                        bottomSheetState.hide()
+                                    }
+                                }
+                            }
+                        }
                     )
                 }
-            }
-        }
-    }
-
-    if(showBottomSheet && selectedPokemon != null) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
-            sheetState = bottomSheetState
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Base Stats",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                val stats = selectedPokemon.stats
-                Text(text = "HP: ${stats.hp}", fontSize = 16.sp, color = Color.Black)
-                Text(text = "Attack: ${stats.attack}", fontSize = 16.sp, color = Color.Black)
-                Text(text = "Defense: ${stats.defense}", fontSize = 16.sp, color = Color.Black)
-                Text(text = "Speed: ${stats.speed}", fontSize = 16.sp, color = Color.Black)
-                Text(text = "Special Attack: ${stats.specialAttack}", fontSize = 16.sp, color = Color.Black)
-                Text(text = "Special Defense: ${stats.specialDefense}", fontSize = 16.sp, color = Color.Black)
-
-                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 }
 
 @Composable
-fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color, onShowBottomSheet: () -> Unit) {
+fun PokemonDetailContent(
+    pokemonDetail: PokemonDetail,
+    topColor: Color,
+    onStatsClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -252,11 +261,11 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color, onShowBo
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row (
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Column (
+                Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -271,7 +280,7 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color, onShowBo
                     )
                 }
 
-                Column (
+                Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -290,42 +299,17 @@ fun PokemonDetailContent(pokemonDetail: PokemonDetail, topColor: Color, onShowBo
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = {
-                    onShowBottomSheet()
-                },
+                onClick = onStatsClick,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(213,59,71))
             ) {
                 Text(
-                    text = "base stats",
+                    text = "Base Stats",
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = Color.White
                 )
             }
         }
-    }
-}
-
-@Composable
-fun TypeBadge(typeName: String) {
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .width(150.dp)
-            .background(
-                color = getTypeColor(typeName),
-                shape = RoundedCornerShape(24.dp)
-            )
-            .padding(vertical = 4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = typeName,
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
-        )
     }
 }
