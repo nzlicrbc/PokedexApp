@@ -3,6 +3,12 @@ package com.example.pokedexapp.ui.screen.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -10,18 +16,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.pokedexapp.domain.model.PokemonStats
+import kotlinx.coroutines.delay
 
 @Composable
 fun StatBottomSheet(
     stats: PokemonStats,
-    isExpanded: Boolean
+    isExpanded: Boolean,
+    isSheetVisible: Boolean = false
 ) {
+    var animationTrigger by remember { mutableStateOf(0) }
+
+    LaunchedEffect(isSheetVisible) {
+        if (isSheetVisible) {
+            delay(50)
+            animationTrigger++
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Base Stats",
@@ -31,39 +47,64 @@ fun StatBottomSheet(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        StatItem(label = "HP", value = stats.hp)
-        StatItem(label = "Attack", value = stats.attack)
+        key(animationTrigger) {
+            StatBar(
+                statName = "HP",
+                statValue = stats.hp,
+                statMaxValue = 300,
+                barColor = StatColors.HP,
+                isVisible = isSheetVisible,
+                animationDelay = 100
+            )
 
-        if (isExpanded) {
-            StatItem(label = "Defense", value = stats.defense)
-            StatItem(label = "Speed", value = stats.speed)
-            StatItem(label = "Special Attack", value = stats.specialAttack)
-            StatItem(label = "Special Defense", value = stats.specialDefense)
+            StatBar(
+                statName = "ATK",
+                statValue = stats.attack,
+                statMaxValue = 300,
+                barColor = StatColors.ATTACK,
+                isVisible = isSheetVisible,
+                animationDelay = 200
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-    }
-}
+        if (isExpanded) {
+            StatBar(
+                statName = "DEF",
+                statValue = stats.defense,
+                statMaxValue = 300,
+                barColor = StatColors.DEFENSE,
+                isVisible = true,
+                animationDelay = 300
+            )
 
-@Composable
-fun StatItem(label: String, value: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            fontSize = 16.sp,
-            color = Color.LightGray,
-            fontWeight = FontWeight.Medium
-        )
-        Text(
-            text = value.toString(),
-            fontSize = 16.sp,
-            color = Color.LightGray,
-            fontWeight = FontWeight.Bold
-        )
+            StatBar(
+                statName = "SPD",
+                statValue = stats.speed,
+                statMaxValue = 300,
+                barColor = StatColors.SPEED,
+                isVisible = true,
+                animationDelay = 400
+            )
+
+            StatBar(
+                statName = "S.DEF",
+                statValue = stats.specialDefense,
+                statMaxValue = 300,
+                barColor = StatColors.SPECIAL_DEFENSE,
+                isVisible = true,
+                animationDelay = 500
+            )
+
+            StatBar(
+                statName = "EXP",
+                statValue = stats.specialAttack,
+                statMaxValue = 1000,
+                barColor = StatColors.SPECIAL_ATTACK,
+                isVisible = true,
+                animationDelay = 600
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
