@@ -84,4 +84,5 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.material3)
+    implementation(libs.androidx.palette.ktx)
 }

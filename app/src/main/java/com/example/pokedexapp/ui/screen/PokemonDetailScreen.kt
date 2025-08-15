@@ -34,6 +34,7 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -47,7 +48,7 @@ import coil.compose.AsyncImage
 import com.example.pokedexapp.domain.model.PokemonDetail
 import com.example.pokedexapp.ui.screen.components.StatBottomSheet
 import com.example.pokedexapp.ui.screen.components.TypeBadge
-import com.example.pokedexapp.ui.theme.getTypeColor
+import com.example.pokedexapp.util.rememberDominantColor
 import com.example.pokedexapp.viewmodel.PokemonViewModel
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -78,7 +79,9 @@ fun PokemonDetailScreen(
         viewModel.getPokemonDetail(pokemonId)
     }
 
-    val typeColor = getTypeColor(selectedPokemon?.types?.firstOrNull() ?: "normal")
+    val dominantColor by rememberDominantColor(
+        imageUrl = selectedPokemon?.imageUrl
+    )
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -119,7 +122,7 @@ fun PokemonDetailScreen(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = typeColor
+                    containerColor = dominantColor
                 )
             )
         },
@@ -167,7 +170,7 @@ fun PokemonDetailScreen(
                 selectedPokemon != null -> {
                     PokemonDetailContent(
                         pokemonDetail = selectedPokemon,
-                        topColor = typeColor,
+                        topColor = dominantColor,
                         onStatsClick = {
                             scope.launch {
                                 when (bottomSheetState.currentValue) {

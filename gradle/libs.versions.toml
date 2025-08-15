@@ -15,6 +15,7 @@ coil = "2.4.0"
 navigation = "2.7.3"
 lifecycle = "2.6.1"
 material3 = "1.1.2"
+palette = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,7 @@ navigation-compose = { module = "androidx.navigation:navigation-compose", versio
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

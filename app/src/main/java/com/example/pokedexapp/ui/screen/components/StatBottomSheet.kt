@@ -96,9 +96,9 @@ fun StatBottomSheet(
             )
 
             StatBar(
-                statName = "EXP",
+                statName = "S.ATK",
                 statValue = stats.specialAttack,
-                statMaxValue = 1000,
+                statMaxValue = 300,
                 barColor = StatColors.SPECIAL_ATTACK,
                 isVisible = true,
                 animationDelay = 600
