@@ -115,7 +115,11 @@ fun PokemonDetailScreen(
                 },
                 actions = {
                     Text(
-                        text = "#${selectedPokemon?.id.toString().padStart(3, '0')}",
+                        text = if(selectedPokemon?.id != null) {
+                            "#${selectedPokemon?.id.toString().padStart(3, '0')}"
+                        } else {
+                            ""
+                        },
                         fontSize = 18.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Medium
