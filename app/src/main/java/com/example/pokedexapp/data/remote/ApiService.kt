@@ -11,20 +11,17 @@ import retrofit2.http.Query
 interface ApiService {
     @GET("pokemon")
     suspend fun getPokemonList(
-        @Header("Authorization") auth: String = "Bearer ${BuildConfig.UUID}",
         @Query("limit") limit: Int = 20,
         @Query("offset") offset: Int = 0
     ): PokemonListResponse
 
     @GET("pokemon/{id}")
     suspend fun getPokemonDetailById(
-        @Header("Authorization") auth: String = "Bearer ${BuildConfig.UUID}",
         @Path("id") id: Int
     ): PokemonDetailResponse
 
     @GET("pokemon/{name}")
     suspend fun getPokemonDetailByName(
-        @Header("Authorization") auth: String = "Bearer ${BuildConfig.UUID}",
         @Path("name") name: String
     ): PokemonDetailResponse
 }
