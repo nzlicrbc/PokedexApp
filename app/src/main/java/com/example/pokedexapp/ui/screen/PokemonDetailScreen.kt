@@ -35,10 +35,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +81,10 @@ fun PokemonDetailScreen(
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
 
+    var collapsedHeight by remember { mutableStateOf(0.dp) }
+    var expandedHeight by remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
+
     val bottomSheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
         skipHiddenState = false
@@ -98,10 +106,11 @@ fun PokemonDetailScreen(
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = if (bottomSheetState.currentValue == SheetValue.Hidden)
-            dimensionResource(R.dimen.bottom_sheet_hidden_peek_height)
-        else
-            dimensionResource(R.dimen.bottom_sheet_peek_height),
+        sheetPeekHeight = when (bottomSheetState.currentValue) {
+            SheetValue.Hidden -> 0.dp
+            SheetValue.PartiallyExpanded -> collapsedHeight
+            SheetValue.Expanded -> expandedHeight
+        },
         sheetContainerColor = bottomSheetBackground,
         containerColor = screenBackground,
         sheetSwipeEnabled = bottomSheetState.currentValue != SheetValue.Hidden,
@@ -151,7 +160,13 @@ fun PokemonDetailScreen(
                 StatBottomSheet(
                     stats = selectedPokemon.stats,
                     isExpanded = bottomSheetState.currentValue == SheetValue.Expanded,
-                    isSheetVisible = bottomSheetState.currentValue != SheetValue.Hidden
+                    isSheetVisible = bottomSheetState.currentValue != SheetValue.Hidden,
+                    onCollapsedSizeChanged = { size ->
+                        collapsedHeight = with(density) { size.height.toDp() }
+                    },
+                    onExpandedSizeChanged = { size ->
+                        expandedHeight = with(density) { size.height.toDp() }
+                    }
                 )
             }
         }
