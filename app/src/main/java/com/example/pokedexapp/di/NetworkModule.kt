@@ -69,7 +69,7 @@ object NetworkModule {
         gson: Gson
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Constants.POKEMON_API_BASE_URL)
+            .baseUrl(BuildConfig.POKEMON_API_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
