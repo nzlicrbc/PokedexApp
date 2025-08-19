@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.pokedexapp.ui.screen.PokemonDetailScreen
 import com.example.pokedexapp.ui.screen.PokemonListScreen
+import com.example.pokedexapp.util.Constants
 
 @Composable
 fun NavGraph(
@@ -17,7 +18,7 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "pokemon_list"
+        startDestination = NavigationRoute.PokemonList.route
     ) {
         composable(
             route = NavigationRoute.PokemonList.route
@@ -29,9 +30,9 @@ fun NavGraph(
 
         composable(
             route = NavigationRoute.PokemonDetail.route,
-            arguments = listOf(navArgument("pokemonId") { type = NavType.IntType })
+            arguments = listOf(navArgument(Constants.POKEMON_ID_ARG) { type = NavType.IntType })
         ){ backStackEntry ->
-            val pokemonId = backStackEntry.arguments?.getInt("pokemonId") ?: 1
+            val pokemonId = backStackEntry.arguments?.getInt(Constants.POKEMON_ID_ARG) ?: Constants.DEFAULT_POKEMON_ID
             PokemonDetailScreen(
                 pokemonId = pokemonId,
                 navController = navController
@@ -41,8 +42,8 @@ fun NavGraph(
 }
 
 sealed class NavigationRoute(val route: String) {
-    object PokemonList : NavigationRoute("pokemon_list")
-    object PokemonDetail : NavigationRoute("pokemon_detail/{pokemonId}") {
-        fun createRoute(pokemonId: Int) = "pokemon_detail/$pokemonId"
+    object PokemonList : NavigationRoute(Constants.ROUTE_POKEMON_LIST)
+    object PokemonDetail : NavigationRoute(Constants.ROUTE_POKEMON_DETAIL_WITH_ARG) {
+        fun createRoute(pokemonId: Int) = "${Constants.ROUTE_POKEMON_DETAIL}/$pokemonId"
     }
 }

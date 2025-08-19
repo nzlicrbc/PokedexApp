@@ -12,13 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.pokedexapp.R
 import com.example.pokedexapp.domain.model.Pokemon
+import com.example.pokedexapp.ui.theme.pokemonItemFallback
+import com.example.pokedexapp.ui.theme.pokemonNameText
+import com.example.pokedexapp.util.Constants
 import com.example.pokedexapp.util.rememberDominantColor
 import java.util.Locale
 
@@ -30,26 +35,26 @@ fun PokemonItem(
     val context = LocalContext.current
     val dominantColor by rememberDominantColor(
         imageUrl = pokemon.imageUrl,
-        fallbackColor = Color.Gray
+        fallbackColor = pokemonItemFallback
     )
 
     Card(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            .aspectRatio(Constants.POKEMON_ITEM_ASPECT_RATIO),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.pokemon_item_corner_radius)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.pokemon_item_elevation)),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(dominantColor.copy(alpha = 0.6f))
+                .background(dominantColor.copy(alpha = Constants.POKEMON_ITEM_BACKGROUND_ALPHA))
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(8.dp),
+                    .padding(dimensionResource(R.dimen.pokemon_item_padding)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -60,21 +65,21 @@ fun PokemonItem(
                         .build(),
                     contentDescription = pokemon.name,
                     modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .aspectRatio(1f),
+                        .fillMaxWidth(Constants.POKEMON_IMAGE_WIDTH_RATIO)
+                        .aspectRatio(Constants.POKEMON_IMAGE_ASPECT_RATIO),
                     contentScale = ContentScale.Fit
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.pokemon_item_spacer_height)))
 
                 Text(
                     text = pokemon.name.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(Locale.getDefault())
                         else it.toString()
                     },
-                    fontSize = 18.sp,
+                    fontSize = dimensionResource(R.dimen.pokemon_name_text_size).value.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
+                    color = pokemonNameText,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )

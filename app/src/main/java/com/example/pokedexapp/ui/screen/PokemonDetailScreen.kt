@@ -39,15 +39,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.pokedexapp.R
 import com.example.pokedexapp.domain.model.PokemonDetail
 import com.example.pokedexapp.ui.screen.components.StatBottomSheet
 import com.example.pokedexapp.ui.screen.components.TypeBadge
+import com.example.pokedexapp.ui.theme.bottomSheetBackground
+import com.example.pokedexapp.ui.theme.errorText
+import com.example.pokedexapp.ui.theme.measurementLabel
+import com.example.pokedexapp.ui.theme.measurementValue
+import com.example.pokedexapp.ui.theme.pokemonDetailName
+import com.example.pokedexapp.ui.theme.screenBackground
+import com.example.pokedexapp.ui.theme.statsButton
+import com.example.pokedexapp.ui.theme.statsButtonText
+import com.example.pokedexapp.ui.theme.topBarText
+import com.example.pokedexapp.util.Constants
 import com.example.pokedexapp.util.rememberDominantColor
 import com.example.pokedexapp.viewmodel.PokemonViewModel
 import kotlinx.coroutines.launch
@@ -85,18 +98,21 @@ fun PokemonDetailScreen(
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = if (bottomSheetState.currentValue == SheetValue.Hidden) 0.dp else 200.dp,
-        sheetContainerColor = Color(43, 41, 44),
-        containerColor = Color(43, 41, 44),
+        sheetPeekHeight = if (bottomSheetState.currentValue == SheetValue.Hidden)
+            dimensionResource(R.dimen.bottom_sheet_hidden_peek_height)
+        else
+            dimensionResource(R.dimen.bottom_sheet_peek_height),
+        sheetContainerColor = bottomSheetBackground,
+        containerColor = screenBackground,
         sheetSwipeEnabled = bottomSheetState.currentValue != SheetValue.Hidden,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Pokedex",
-                        fontSize = 20.sp,
+                        text = stringResource(R.string.app_name),
+                        fontSize = dimensionResource(R.dimen.top_bar_title_text_size).value.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = topBarText
                     )
                 },
                 navigationIcon = {
@@ -108,20 +124,20 @@ fun PokemonDetailScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Geri",
-                            tint = Color.White
+                            contentDescription = stringResource(R.string.back_button_description),
+                            tint = topBarText
                         )
                     }
                 },
                 actions = {
                     Text(
                         text = if(selectedPokemon?.id != null) {
-                            "#${selectedPokemon?.id.toString().padStart(3, '0')}"
+                            "${stringResource(R.string.pokemon_id_prefix)}${selectedPokemon?.id.toString().padStart(Constants.POKEMON_ID_PADDING, '0')}"
                         } else {
                             ""
                         },
-                        fontSize = 18.sp,
-                        color = Color.White,
+                        fontSize = dimensionResource(R.dimen.pokemon_id_text_size).value.sp,
+                        color = topBarText,
                         fontWeight = FontWeight.Medium
                     )
                 },
@@ -156,17 +172,17 @@ fun PokemonDetailScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(16.dp),
+                            .padding(dimensionResource(R.dimen.error_screen_padding)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = error, color = Color.Red)
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(text = error, color = errorText)
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.error_screen_spacer_height)))
                         Button(onClick = {
                             viewModel.clearError()
                             viewModel.getPokemonDetail(pokemonId)
                         }) {
-                            Text("Tekrar dene")
+                            Text(stringResource(R.string.retry_button_text))
                         }
                     }
                 }
@@ -208,25 +224,25 @@ fun PokemonDetailContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(43, 41, 44))
+            .background(screenBackground)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(dimensionResource(R.dimen.pokemon_image_container_height))
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             topColor,
-                            topColor.copy(alpha = 0.9f),
-                            topColor.copy(alpha = 0.6f)
+                            topColor.copy(alpha = Constants.GRADIENT_ALPHA_HIGH),
+                            topColor.copy(alpha = Constants.GRADIENT_ALPHA_LOW)
                         )
                     ),
                     shape = RoundedCornerShape(
-                        bottomStart = 32.dp,
-                        bottomEnd = 32.dp
+                        bottomStart = dimensionResource(R.dimen.pokemon_image_container_corner_radius),
+                        bottomEnd = dimensionResource(R.dimen.pokemon_image_container_corner_radius)
                     )
                 ),
             contentAlignment = Alignment.Center
@@ -234,38 +250,38 @@ fun PokemonDetailContent(
             AsyncImage(
                 model = pokemonDetail.imageUrl,
                 contentDescription = pokemonDetail.name,
-                modifier = Modifier.size(250.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.pokemon_detail_image_size))
             )
         }
 
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(dimensionResource(R.dimen.pokemon_detail_content_padding)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.pokemon_name_top_spacer)))
 
             Text(
                 text = pokemonDetail.name.replaceFirstChar {
                     if (it.isLowerCase()) it.titlecase(Locale.getDefault())
                     else it.toString()
                 },
-                fontSize = 32.sp,
-                color = Color.White,
+                fontSize = dimensionResource(R.dimen.pokemon_name_text_size_detail).value.sp,
+                color = pokemonDetailName,
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.pokemon_types_top_spacer)))
 
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(vertical = 8.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.type_badges_spacing)),
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.type_badges_vertical_padding))
             ) {
                 items(pokemonDetail.types) { type ->
                     TypeBadge(typeName = type)
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.pokemon_measurements_top_spacer)))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -276,13 +292,13 @@ fun PokemonDetailContent(
                 ) {
                     Text(
                         text = "${pokemonDetail.weight}",
-                        fontSize = 16.sp,
-                        color = Color.White
+                        fontSize = dimensionResource(R.dimen.measurement_value_text_size).value.sp,
+                        color = measurementValue
                     )
                     Text(
-                        text = "weight",
-                        fontSize = 12.sp,
-                        color = Color.LightGray
+                        text = stringResource(R.string.weight_label),
+                        fontSize = dimensionResource(R.dimen.measurement_label_text_size).value.sp,
+                        color = measurementLabel
                     )
                 }
 
@@ -291,29 +307,29 @@ fun PokemonDetailContent(
                 ) {
                     Text(
                         text = "${pokemonDetail.height}",
-                        fontSize = 16.sp,
-                        color = Color.White
+                        fontSize = dimensionResource(R.dimen.measurement_value_text_size).value.sp,
+                        color = measurementValue
                     )
                     Text(
-                        text = "height",
-                        fontSize = 12.sp,
-                        color = Color.LightGray
+                        text = stringResource(R.string.height_label),
+                        fontSize = dimensionResource(R.dimen.measurement_label_text_size).value.sp,
+                        color = measurementLabel
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.stats_button_top_spacer)))
 
             Button(
                 onClick = onStatsClick,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(213,59,71))
+                colors = ButtonDefaults.buttonColors(containerColor = statsButton)
             ) {
                 Text(
-                    text = "Base Stats",
-                    fontSize = 20.sp,
+                    text = stringResource(R.string.base_stats_button_text),
+                    fontSize = dimensionResource(R.dimen.stats_button_text_size).value.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = statsButtonText
                 )
             }
         }

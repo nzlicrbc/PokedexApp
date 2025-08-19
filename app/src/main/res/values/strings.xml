@@ -1,3 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Pokedex App</string>
+
+    <!-- Hata mesajları -->
+    <string name="error_occurred">Bir hata oluştu:</string>
+    <string name="check_internet_connection">İnternet bağlantınızı kontrol edin</string>
+    <string name="unexpected_error_occurred">Beklenmeyen bir hata oluştu:</string>
+    <string name="pokemon_details_load_error">Pokemon detayları yüklenemedi:</string>
+
+    <!-- Buton metinleri -->
+    <string name="retry_button_text">Tekrar dene</string>
+    <string name="base_stats_button_text">Base Stats</string>
+
+    <!-- Pokemon istatistikleri -->
+    <string name="base_stats_title">Base Stats</string>
+    <string name="stat_hp_short">HP</string>
+    <string name="stat_attack_short">ATK</string>
+    <string name="stat_defense_short">DEF</string>
+    <string name="stat_speed_short">SPD</string>
+    <string name="stat_special_defense_short">S.DEF</string>
+    <string name="stat_special_attack_short">S.ATK</string>
+
+    <!-- Pokemon ölçüleri -->
+    <string name="weight_label">weight</string>
+    <string name="height_label">height</string>
+    <string name="unit_kg">KG</string>
+    <string name="unit_m">M</string>
+
+    <!-- Navigasyon ve UI -->
+    <string name="back_button_description">Geri</string>
+    <string name="pokemon_id_prefix">#</string>
+
 </resources>

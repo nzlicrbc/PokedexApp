@@ -10,29 +10,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.pokedexapp.R
 import com.example.pokedexapp.ui.theme.getTypeColor
+import com.example.pokedexapp.ui.theme.typeBadgeText
 
 @Composable
 fun TypeBadge(typeName: String) {
     Box(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .width(150.dp)
+            .padding(horizontal = dimensionResource(R.dimen.type_badge_horizontal_padding))
+            .width(dimensionResource(R.dimen.type_badge_width))
             .background(
                 color = getTypeColor(typeName),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(dimensionResource(R.dimen.type_badge_corner_radius))
             )
-            .padding(vertical = 4.dp),
+            .padding(vertical = dimensionResource(R.dimen.type_badge_vertical_padding)),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = typeName,
-            color = Color.White,
-            fontSize = 14.sp,
+            color = typeBadgeText,
+            fontSize = dimensionResource(R.dimen.type_badge_text_size).value.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
         )

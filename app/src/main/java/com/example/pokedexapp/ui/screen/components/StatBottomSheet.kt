@@ -12,10 +12,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.pokedexapp.R
 import com.example.pokedexapp.domain.model.PokemonStats
+import com.example.pokedexapp.ui.theme.attack
+import com.example.pokedexapp.ui.theme.defense
+import com.example.pokedexapp.ui.theme.hp
+import com.example.pokedexapp.ui.theme.specialAttack
+import com.example.pokedexapp.ui.theme.specialDefense
+import com.example.pokedexapp.ui.theme.speed
+import com.example.pokedexapp.ui.theme.statSheetTitle
+import com.example.pokedexapp.util.Constants
 import kotlinx.coroutines.delay
 
 @Composable
@@ -24,11 +35,11 @@ fun StatBottomSheet(
     isExpanded: Boolean,
     isSheetVisible: Boolean = false
 ) {
-    var animationTrigger by remember { mutableStateOf(0) }
+    var animationTrigger by remember { mutableStateOf(Constants.DEFAULT_ANIMATION_TRIGGER) }
 
     LaunchedEffect(isSheetVisible) {
         if (isSheetVisible) {
-            delay(50)
+            delay(Constants.STAT_SHEET_ANIMATION_DELAY)
             animationTrigger++
         }
     }
@@ -36,75 +47,75 @@ fun StatBottomSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp),
+            .padding(dimensionResource(R.dimen.stat_sheet_padding)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Base Stats",
-            fontSize = 20.sp,
+            text = stringResource(R.string.base_stats_title),
+            fontSize = dimensionResource(R.dimen.stat_sheet_title_text_size).value.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.padding(bottom = 8.dp)
+            color = statSheetTitle,
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.stat_sheet_title_bottom_padding))
         )
 
         key(animationTrigger) {
             StatBar(
-                statName = "HP",
+                statName = stringResource(R.string.stat_hp_short),
                 statValue = stats.hp,
-                statMaxValue = 300,
-                barColor = StatColors.HP,
+                statMaxValue = Constants.MAX_STAT_VALUE,
+                barColor = hp,
                 isVisible = isSheetVisible,
-                animationDelay = 100
+                animationDelay = Constants.STAT_HP_ANIMATION_DELAY
             )
 
             StatBar(
-                statName = "ATK",
+                statName = stringResource(R.string.stat_attack_short),
                 statValue = stats.attack,
-                statMaxValue = 300,
-                barColor = StatColors.ATTACK,
+                statMaxValue = Constants.MAX_STAT_VALUE,
+                barColor = attack,
                 isVisible = isSheetVisible,
-                animationDelay = 200
+                animationDelay = Constants.STAT_ATTACK_ANIMATION_DELAY
             )
         }
 
         if (isExpanded) {
             StatBar(
-                statName = "DEF",
+                statName = stringResource(R.string.stat_defense_short),
                 statValue = stats.defense,
-                statMaxValue = 300,
-                barColor = StatColors.DEFENSE,
+                statMaxValue = Constants.MAX_STAT_VALUE,
+                barColor = defense,
                 isVisible = true,
-                animationDelay = 300
+                animationDelay = Constants.STAT_DEFENSE_ANIMATION_DELAY
             )
 
             StatBar(
-                statName = "SPD",
+                statName = stringResource(R.string.stat_speed_short),
                 statValue = stats.speed,
-                statMaxValue = 300,
-                barColor = StatColors.SPEED,
+                statMaxValue = Constants.MAX_STAT_VALUE,
+                barColor = speed,
                 isVisible = true,
-                animationDelay = 400
+                animationDelay = Constants.STAT_SPEED_ANIMATION_DELAY
             )
 
             StatBar(
-                statName = "S.DEF",
+                statName = stringResource(R.string.stat_special_defense_short),
                 statValue = stats.specialDefense,
-                statMaxValue = 300,
-                barColor = StatColors.SPECIAL_DEFENSE,
+                statMaxValue = Constants.MAX_STAT_VALUE,
+                barColor = specialDefense,
                 isVisible = true,
-                animationDelay = 500
+                animationDelay = Constants.STAT_SPECIAL_DEFENSE_ANIMATION_DELAY
             )
 
             StatBar(
-                statName = "S.ATK",
+                statName = stringResource(R.string.stat_special_attack_short),
                 statValue = stats.specialAttack,
-                statMaxValue = 300,
-                barColor = StatColors.SPECIAL_ATTACK,
+                statMaxValue = Constants.MAX_STAT_VALUE,
+                barColor = specialAttack,
                 isVisible = true,
-                animationDelay = 600
+                animationDelay = Constants.STAT_SPECIAL_ATTACK_ANIMATION_DELAY
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.stat_sheet_bottom_spacer)))
     }
 }

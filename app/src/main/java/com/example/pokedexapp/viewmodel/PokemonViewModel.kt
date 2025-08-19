@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.pokedexapp.domain.model.Pokemon
 import com.example.pokedexapp.domain.model.PokemonDetail
 import com.example.pokedexapp.domain.repository.PokemonRepository
+import com.example.pokedexapp.util.Constants
 import com.example.pokedexapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -34,10 +35,10 @@ class PokemonViewModel @Inject constructor(
     private val _isDetailLoading = mutableStateOf(false)
     val isDetailLoading: State<Boolean> = _isDetailLoading
 
-    private var currentPage = 0
+    private var currentPage = Constants.INITIAL_PAGE
     private var isLastPage = false
     private var isLoadingMore = false
-    private val pageSize = 20
+    private val pageSize = Constants.DEFAULT_POKEMON_LIST_LIMIT
 
     init {
         loadPokemons()
@@ -45,16 +46,16 @@ class PokemonViewModel @Inject constructor(
 
     fun loadPokemons() {
         repository.getPokemonList(
-            limit = 20,
-            offset = 0
+            limit = Constants.DEFAULT_POKEMON_LIST_LIMIT,
+            offset = Constants.DEFAULT_POKEMON_LIST_OFFSET
         ).onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _pokemonList.value = result.data ?: emptyList()
                     _isLoading.value = false
                     _error.value = null
-                    currentPage = 0
-                    isLastPage = (result.data?.size ?: 0) < PAGE_SIZE
+                    currentPage = Constants.INITIAL_PAGE
+                    isLastPage = (result.data?.size ?: Constants.DEFAULT_SIZE_WHEN_NULL) < pageSize
                 }
 
                 is Resource.Error -> {
@@ -74,10 +75,10 @@ class PokemonViewModel @Inject constructor(
         if (isLoadingMore || isLastPage || _isLoading.value) return
 
         isLoadingMore = true
-        val nextPage = currentPage +1
+        val nextPage = currentPage + Constants.PAGE_INCREMENT
 
         repository.getPokemonList(
-            limit = 20,
+            limit = Constants.DEFAULT_POKEMON_LIST_LIMIT,
             offset = nextPage * pageSize
         ).onEach { result ->
             when (result) {

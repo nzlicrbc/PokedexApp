@@ -1,7 +1,5 @@
 package com.example.pokedexapp.ui.screen
 
-import android.R
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,12 +24,24 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.pokedexapp.R
 import com.example.pokedexapp.domain.model.Pokemon
+import com.example.pokedexapp.navigation.NavigationRoute
 import com.example.pokedexapp.ui.screen.components.PokemonItem
+import com.example.pokedexapp.ui.theme.errorText
+import com.example.pokedexapp.ui.theme.loadingIndicator
+import com.example.pokedexapp.ui.theme.paginationLoadingIndicator
+import com.example.pokedexapp.ui.theme.pokemonListBackground
+import com.example.pokedexapp.ui.theme.pokemonListTitle
+import com.example.pokedexapp.ui.theme.pokemonListTopBar
+import com.example.pokedexapp.ui.theme.retryButton
+import com.example.pokedexapp.ui.theme.snackbarActionText
+import com.example.pokedexapp.util.Constants
 import com.example.pokedexapp.viewmodel.PokemonViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +59,7 @@ fun PokemonListScreen(
         isLoading = isLoading,
         error = error,
         onPokemonClick = { pokemonId ->
-            navController.navigate("pokemon_detail/$pokemonId")
+            navController.navigate(NavigationRoute.PokemonDetail.createRoute(pokemonId))
         },
         onLoadMore = { viewModel.loadMorePokemons() },
         onRetry = { viewModel.loadPokemons() },
@@ -71,9 +81,12 @@ fun PokemonListContent(
     Scaffold(
         topBar = {PokemonListTopBar()}
     ) {
-        paddingValues ->
+            paddingValues ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).background(Color(0xFF2B2929))
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(pokemonListBackground)
         ) {
             when {
                 isLoading && pokemonList.isEmpty() -> {
@@ -115,16 +128,16 @@ private fun PokemonListTopBar() {
     TopAppBar(
         title= {
             Text(
-                text = "Pokedex",
-                fontSize = 24.sp,
+                text = stringResource(R.string.app_name),
+                fontSize = dimensionResource(R.dimen.pokemon_list_title_text_size).value.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = pokemonListTitle,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFFD53B3B)
+            containerColor = pokemonListTopBar
         ),
         modifier = Modifier.statusBarsPadding()
     )
@@ -137,7 +150,7 @@ private fun LoadingView(){
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = Color(0xFFE3350D)
+            color = loadingIndicator
         )
     }
 }
@@ -148,23 +161,25 @@ private fun ErrorView(
     onRetry: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(dimensionResource(R.dimen.error_view_padding)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = error,
-            color = Color.Red,
+            color = errorText,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.error_text_bottom_padding))
         )
         Button(
             onClick = onRetry,
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFE3350D)
+                containerColor = retryButton
             )
         ) {
-            Text("Tekrar Dene")
+            Text(stringResource(R.string.retry_button_text))
         }
     }
 }
@@ -182,8 +197,8 @@ private fun PokemonGridContent(
         derivedStateOf {
             val layoutInfo = gridState.layoutInfo
             val totalItemsCount = layoutInfo.totalItemsCount
-            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            lastVisibleItemIndex >= totalItemsCount - 4 && !isLoading
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: Constants.DEFAULT_LAST_VISIBLE_INDEX
+            lastVisibleItemIndex >= totalItemsCount - Constants.LOAD_MORE_THRESHOLD && !isLoading
         }
     }
 
@@ -194,11 +209,11 @@ private fun PokemonGridContent(
     }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Fixed(Constants.POKEMON_GRID_COLUMNS),
         state = gridState,
-        contentPadding = PaddingValues(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(dimensionResource(R.dimen.pokemon_grid_content_padding)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.pokemon_grid_horizontal_spacing)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.pokemon_grid_vertical_spacing)),
         modifier = Modifier.fillMaxSize()
     ) {
         itemsIndexed(
@@ -212,7 +227,7 @@ private fun PokemonGridContent(
         }
 
         if(isLoading && pokemonList.isNotEmpty()) {
-            item(span = { GridItemSpan(2) }) {
+            item(span = { GridItemSpan(Constants.POKEMON_GRID_COLUMNS) }) {
                 PaginationLoadingItem()
             }
         }
@@ -222,12 +237,14 @@ private fun PokemonGridContent(
 @Composable
 private fun PaginationLoadingItem() {
     Box(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(dimensionResource(R.dimen.pagination_loading_padding)),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = Color(0xFFE3350D),
-            modifier = Modifier.size(24.dp)
+            color = paginationLoadingIndicator,
+            modifier = Modifier.size(dimensionResource(R.dimen.pagination_loading_size))
         )
     }
 }
@@ -239,10 +256,13 @@ private fun PaginationErrorSnackbar(
     modifier: Modifier = Modifier
 ){
     Snackbar(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(dimensionResource(R.dimen.snackbar_padding)),
         action = {
             TextButton(onClick = onRetry) {
-                Text("Tekrar Dene", color = Color.White)
+                Text(
+                    text = stringResource(R.string.retry_button_text),
+                    color = snackbarActionText
+                )
             }
         }
     ) {

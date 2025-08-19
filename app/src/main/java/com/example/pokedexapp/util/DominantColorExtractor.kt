@@ -9,6 +9,7 @@ import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
+import com.example.pokedexapp.ui.theme.dominantColorFallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,7 +18,7 @@ object DominantColorExtractor {
     suspend fun extractDominantColor(
         imageUrl: String?,
         context: Context,
-        fallbackColor: Color = Color.Gray
+        fallbackColor: Color = dominantColorFallback
     ): Color {
         return withContext(Dispatchers.IO) {
             try {
@@ -25,7 +26,7 @@ object DominantColorExtractor {
 
                 val request = ImageRequest.Builder(context)
                     .data(imageUrl)
-                    .allowHardware(false)
+                    .allowHardware(Constants.IMAGE_HARDWARE_ACCELERATION_ENABLED)
                     .build()
 
                 val imageLoader = ImageLoader(context)
@@ -57,7 +58,7 @@ object DominantColorExtractor {
 @Composable
 fun rememberDominantColor(
     imageUrl: String?,
-    fallbackColor: Color = Color.Gray
+    fallbackColor: Color = dominantColorFallback
 ): State<Color> {
     val context = LocalContext.current
     val dominantColor = remember { mutableStateOf(fallbackColor) }
