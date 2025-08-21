@@ -138,8 +138,7 @@ private fun PokemonListTopBar() {
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = pokemonListTopBar
-        ),
-        modifier = Modifier.statusBarsPadding()
+        )
     )
 }
 
