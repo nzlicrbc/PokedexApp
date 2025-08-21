@@ -12,7 +12,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,8 +38,7 @@ fun StatBottomSheet(
     stats: PokemonStats,
     isExpanded: Boolean,
     isSheetVisible: Boolean = false,
-    onCollapsedSizeChanged: (IntSize) -> Unit = {},
-    onExpandedSizeChanged: (IntSize) -> Unit = {}
+    onCollapsedSizeChanged: (IntSize) -> Unit = {}
 ) {
     var animationTrigger by remember { mutableStateOf(Constants.DEFAULT_ANIMATION_TRIGGER) }
 
@@ -51,11 +52,9 @@ fun StatBottomSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .onSizeChanged { size ->
-                if (isExpanded) {
-                    onExpandedSizeChanged(size)
-                } else {
-                    onCollapsedSizeChanged(size)
+            .onGloballyPositioned { coordinates ->
+                if (!isExpanded) {
+                    onCollapsedSizeChanged(coordinates.size)
                 }
             }
             .padding(dimensionResource(R.dimen.stat_sheet_padding)),

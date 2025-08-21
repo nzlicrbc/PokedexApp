@@ -82,7 +82,6 @@ fun PokemonDetailScreen(
     val error = viewModel.error.value
 
     var collapsedHeight by remember { mutableStateOf(0.dp) }
-    var expandedHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
     val bottomSheetState = rememberStandardBottomSheetState(
@@ -106,11 +105,7 @@ fun PokemonDetailScreen(
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = when (bottomSheetState.currentValue) {
-            SheetValue.Hidden -> 0.dp
-            SheetValue.PartiallyExpanded -> collapsedHeight
-            SheetValue.Expanded -> expandedHeight
-        },
+        sheetPeekHeight = collapsedHeight,
         sheetContainerColor = bottomSheetBackground,
         containerColor = screenBackground,
         sheetSwipeEnabled = bottomSheetState.currentValue != SheetValue.Hidden,
@@ -163,9 +158,6 @@ fun PokemonDetailScreen(
                     isSheetVisible = bottomSheetState.currentValue != SheetValue.Hidden,
                     onCollapsedSizeChanged = { size ->
                         collapsedHeight = with(density) { size.height.toDp() }
-                    },
-                    onExpandedSizeChanged = { size ->
-                        expandedHeight = with(density) { size.height.toDp() }
                     }
                 )
             }
