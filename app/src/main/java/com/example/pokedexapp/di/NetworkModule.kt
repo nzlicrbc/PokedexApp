@@ -34,17 +34,22 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor
-    ): OkHttpClient {
-        val authInterceptor = Interceptor { chain ->
+    fun provideAuthInterceptor(): Interceptor {
+        return Interceptor { chain ->
             val original = chain.request()
             val request = original.newBuilder()
                 .header(Constants.AUTHORIZATION_HEADER, "${Constants.BEARER_PREFIX}${BuildConfig.UUID}")
                 .build()
             chain.proceed(request)
         }
+    }
 
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: Interceptor
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
