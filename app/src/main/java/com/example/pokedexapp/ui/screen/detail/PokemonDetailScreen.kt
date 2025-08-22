@@ -1,16 +1,7 @@
-package com.example.pokedexapp.ui.screen
+package com.example.pokedexapp.ui.screen.detail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -18,26 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -46,61 +19,61 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.pokedexapp.R
 import com.example.pokedexapp.domain.model.PokemonDetail
-import com.example.pokedexapp.ui.screen.components.StatBottomSheet
-import com.example.pokedexapp.ui.screen.components.TypeBadge
-import com.example.pokedexapp.ui.theme.bottomSheetBackground
-import com.example.pokedexapp.ui.theme.errorText
-import com.example.pokedexapp.ui.theme.measurementLabel
-import com.example.pokedexapp.ui.theme.measurementValue
-import com.example.pokedexapp.ui.theme.pokemonDetailName
-import com.example.pokedexapp.ui.theme.screenBackground
-import com.example.pokedexapp.ui.theme.statsButton
-import com.example.pokedexapp.ui.theme.statsButtonText
-import com.example.pokedexapp.ui.theme.topBarText
+import com.example.pokedexapp.ui.screen.detail.components.StatBottomSheet
+import com.example.pokedexapp.ui.screen.detail.components.TypeBadge
+import com.example.pokedexapp.ui.theme.*
 import com.example.pokedexapp.util.Constants
 import com.example.pokedexapp.util.rememberDominantColor
-import com.example.pokedexapp.viewmodel.PokemonViewModel
 import kotlinx.coroutines.launch
-import java.util.Locale
+import java.util.*
+
+@Composable
+fun PokemonDetailScreen(
+    navController: NavController,
+    viewModel: PokemonDetailViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = true) {
+        viewModel.onEvent(PokemonDetailEvent.OnLoadPokemonDetail)
+    }
+
+    PokemonDetailContent(
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
+        onNavigateBack = {
+            navController.popBackStack()
+        }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PokemonDetailScreen(
-    pokemonId: Int,
-    navController: NavController,
-    viewModel: PokemonViewModel = hiltViewModel()
+fun PokemonDetailContent(
+    uiState: PokemonDetailUiState,
+    onEvent: (PokemonDetailEvent) -> Unit,
+    onNavigateBack: () -> Unit
 ) {
-    val selectedPokemon = viewModel.selectedPokemon.value
-    val isLoading = viewModel.isLoading.value
-    val error = viewModel.error.value
-
     var collapsedHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
-
     val bottomSheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
         skipHiddenState = false
     )
-
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = bottomSheetState
-    )
-
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState)
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(pokemonId) {
-        viewModel.getPokemonDetail(pokemonId)
-    }
-
     val dominantColor by rememberDominantColor(
-        imageUrl = selectedPokemon?.imageUrl
+        imageUrl = uiState.pokemonDetail?.imageUrl
     )
 
     BottomSheetScaffold(
@@ -120,12 +93,7 @@ fun PokemonDetailScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            viewModel.clearSelectedPokemon()
-                            navController.popBackStack()
-                        }
-                    ) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back_button_description),
@@ -134,16 +102,14 @@ fun PokemonDetailScreen(
                     }
                 },
                 actions = {
-                    Text(
-                        text = if(selectedPokemon?.id != null) {
-                            "${stringResource(R.string.pokemon_id_prefix)}${selectedPokemon?.id.toString().padStart(Constants.POKEMON_ID_PADDING, '0')}"
-                        } else {
-                            ""
-                        },
-                        fontSize = dimensionResource(R.dimen.pokemon_id_text_size).value.sp,
-                        color = topBarText,
-                        fontWeight = FontWeight.Medium
-                    )
+                    uiState.pokemonDetail?.let {
+                        Text(
+                            text = "#${it.id.toString().padStart(Constants.POKEMON_ID_PADDING, '0')}",
+                            fontSize = dimensionResource(R.dimen.pokemon_id_text_size).value.sp,
+                            color = topBarText,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = dominantColor
@@ -151,9 +117,9 @@ fun PokemonDetailScreen(
             )
         },
         sheetContent = {
-            if (selectedPokemon != null) {
+            uiState.pokemonDetail?.let {
                 StatBottomSheet(
-                    stats = selectedPokemon.stats,
+                    stats = it.stats,
                     isExpanded = bottomSheetState.currentValue == SheetValue.Expanded,
                     isSheetVisible = bottomSheetState.currentValue != SheetValue.Hidden,
                     onCollapsedSizeChanged = { size ->
@@ -169,49 +135,25 @@ fun PokemonDetailScreen(
                 .padding(innerPadding)
         ) {
             when {
-                isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
+                uiState.isLoading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                uiState.error != null && uiState.pokemonDetail == null -> {
+                    ErrorView(
+                        error = uiState.error,
+                        onRetry = { onEvent(PokemonDetailEvent.OnLoadPokemonDetail) }
                     )
                 }
-
-                error != null -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(dimensionResource(R.dimen.error_screen_padding)),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(text = error, color = errorText)
-                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.error_screen_spacer_height)))
-                        Button(onClick = {
-                            viewModel.clearError()
-                            viewModel.getPokemonDetail(pokemonId)
-                        }) {
-                            Text(stringResource(R.string.retry_button_text))
-                        }
-                    }
-                }
-
-                selectedPokemon != null -> {
-                    PokemonDetailContent(
-                        pokemonDetail = selectedPokemon,
+                uiState.pokemonDetail != null -> {
+                    PokemonDetailMainContent(
+                        pokemonDetail = uiState.pokemonDetail,
                         topColor = dominantColor,
                         onStatsClick = {
                             scope.launch {
                                 when (bottomSheetState.currentValue) {
-                                    SheetValue.Hidden -> {
-                                        bottomSheetState.partialExpand()
-                                    }
-
-                                    SheetValue.PartiallyExpanded -> {
-                                        bottomSheetState.expand()
-                                    }
-
-                                    SheetValue.Expanded -> {
-                                        bottomSheetState.hide()
-                                    }
+                                    SheetValue.Hidden -> bottomSheetState.partialExpand()
+                                    SheetValue.PartiallyExpanded -> bottomSheetState.expand()
+                                    SheetValue.Expanded -> bottomSheetState.hide()
                                 }
                             }
                         }
@@ -223,7 +165,27 @@ fun PokemonDetailScreen(
 }
 
 @Composable
-fun PokemonDetailContent(
+private fun ErrorView(
+    error: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(dimensionResource(R.dimen.error_screen_padding)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = error, color = errorText, textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.error_screen_spacer_height)))
+        Button(onClick = onRetry) {
+            Text(stringResource(R.string.retry_button_text))
+        }
+    }
+}
+
+@Composable
+private fun PokemonDetailMainContent(
     pokemonDetail: PokemonDetail,
     topColor: Color,
     onStatsClick: () -> Unit
@@ -294,9 +256,7 @@ fun PokemonDetailContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "${pokemonDetail.weight}",
                         fontSize = dimensionResource(R.dimen.measurement_value_text_size).value.sp,
@@ -308,10 +268,7 @@ fun PokemonDetailContent(
                         color = measurementLabel
                     )
                 }
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "${pokemonDetail.height}",
                         fontSize = dimensionResource(R.dimen.measurement_value_text_size).value.sp,

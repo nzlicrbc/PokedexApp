@@ -1,4 +1,4 @@
-package com.example.pokedexapp.ui.screen.components
+package com.example.pokedexapp.ui.screen.detail.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -11,15 +11,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.pokedexapp.R
 import com.example.pokedexapp.domain.model.PokemonStats

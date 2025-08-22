@@ -1,6 +1,5 @@
 package com.example.pokedexapp.navigation
 
-import android.R.attr.type
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -8,8 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.pokedexapp.ui.screen.PokemonDetailScreen
-import com.example.pokedexapp.ui.screen.PokemonListScreen
+import com.example.pokedexapp.ui.screen.detail.PokemonDetailScreen
+import com.example.pokedexapp.ui.screen.list.PokemonListScreen
 import com.example.pokedexapp.util.Constants
 
 @Composable
@@ -32,9 +31,7 @@ fun NavGraph(
             route = NavigationRoute.PokemonDetail.route,
             arguments = listOf(navArgument(Constants.POKEMON_ID_ARG) { type = NavType.IntType })
         ){ backStackEntry ->
-            val pokemonId = backStackEntry.arguments?.getInt(Constants.POKEMON_ID_ARG) ?: Constants.DEFAULT_POKEMON_ID
             PokemonDetailScreen(
-                pokemonId = pokemonId,
                 navController = navController
             )
         }

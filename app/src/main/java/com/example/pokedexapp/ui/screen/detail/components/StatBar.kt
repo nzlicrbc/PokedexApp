@@ -1,4 +1,4 @@
-package com.example.pokedexapp.ui.screen.components
+package com.example.pokedexapp.ui.screen.detail.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
