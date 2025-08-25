@@ -64,6 +64,14 @@ fun PokemonDetailContent(
     onNavigateBack: () -> Unit
 ) {
     var collapsedHeight by remember { mutableStateOf(0.dp) }
+    val navBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
+    val finalPeekHeight = if (collapsedHeight > 0.dp) {
+        collapsedHeight + navBarHeight
+    } else {
+        0.dp
+    }
+
     val density = LocalDensity.current
     val bottomSheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
@@ -78,7 +86,7 @@ fun PokemonDetailContent(
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = collapsedHeight,
+        sheetPeekHeight = finalPeekHeight,
         sheetContainerColor = bottomSheetBackground,
         containerColor = screenBackground,
         sheetSwipeEnabled = bottomSheetState.currentValue != SheetValue.Hidden,
@@ -117,15 +125,17 @@ fun PokemonDetailContent(
             )
         },
         sheetContent = {
-            uiState.pokemonDetail?.let {
-                StatBottomSheet(
-                    stats = it.stats,
-                    isExpanded = bottomSheetState.currentValue == SheetValue.Expanded,
-                    isSheetVisible = bottomSheetState.currentValue != SheetValue.Hidden,
-                    onCollapsedSizeChanged = { size ->
-                        collapsedHeight = with(density) { size.height.toDp() }
-                    }
-                )
+            Box(modifier = Modifier.navigationBarsPadding()) {
+                uiState.pokemonDetail?.let {
+                    StatBottomSheet(
+                        stats = it.stats,
+                        isExpanded = bottomSheetState.currentValue == SheetValue.Expanded,
+                        isSheetVisible = bottomSheetState.currentValue != SheetValue.Hidden,
+                        onCollapsedSizeChanged = { size ->
+                            collapsedHeight = with(density) { size.height.toDp() }
+                        }
+                    )
+                }
             }
         }
     ) { innerPadding ->
