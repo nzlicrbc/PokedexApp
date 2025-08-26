@@ -94,9 +94,12 @@ class PokemonRepositoryImpl @Inject constructor(
 
             emit(Resource.Success(pokemonDetail))
         } catch (e: HttpException) {
-            emit(Resource.Error(
-                message = "${context.getString(R.string.pokemon_details_load_error)} ${e.localizedMessage}"
-            ))
+            val errorMessage = if (e.code() == 503) {
+                context.getString(R.string.force_update_error)
+            } else {
+                "${context.getString(R.string.pokemon_details_load_error)} ${e.localizedMessage}"
+            }
+            emit(Resource.Error(message = errorMessage))
         } catch (e: IOException) {
             emit(Resource.Error(
                 message = context.getString(R.string.check_internet_connection)

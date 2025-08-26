@@ -31,4 +31,6 @@
     <string name="back_button_description">Geri</string>
     <string name="pokemon_id_prefix">#</string>
 
+    <string name="force_update_error">Uygulamanın yeni bir sürümü mevcut. Lütfen devam etmek için güncelleyin.</string>
+
 </resources>
