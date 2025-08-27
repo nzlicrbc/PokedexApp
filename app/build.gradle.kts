@@ -132,4 +132,6 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.material3)
     implementation(libs.androidx.palette.ktx)
+    debugImplementation(libs.chucker.library)
+    releaseImplementation(libs.chucker.library.no.op)
 }

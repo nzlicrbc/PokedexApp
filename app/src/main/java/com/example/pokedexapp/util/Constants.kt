@@ -81,5 +81,7 @@ object Constants {
 
     // Animation süresi
     const val COLOR_ANIMATION_DURATION_MS = 100
-    const val IMAGE_CROSSFADE_ENABLED = true
+
+    // Chucker
+    const val CHUCKER_MAX_CONTENT_LENGTH = 250_000L
 }

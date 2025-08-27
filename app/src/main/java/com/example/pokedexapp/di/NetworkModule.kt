@@ -1,5 +1,7 @@
 package com.example.pokedexapp.di
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.pokedexapp.BuildConfig
 import com.example.pokedexapp.data.remote.ApiService
 import com.example.pokedexapp.data.remote.interceptor.ForceDetailErrorInterceptor
@@ -9,6 +11,7 @@ import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -53,15 +56,26 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideChuckerInterceptor(@ApplicationContext context: Context): ChuckerInterceptor {
+        return ChuckerInterceptor.Builder(context)
+            .maxContentLength(Constants.CHUCKER_MAX_CONTENT_LENGTH)
+            .alwaysReadResponseBody(true)
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: Interceptor,
-        forceDetailErrorInterceptor: ForceDetailErrorInterceptor
+        forceDetailErrorInterceptor: ForceDetailErrorInterceptor,
+        chuckerInterceptor: ChuckerInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(forceDetailErrorInterceptor)
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(chuckerInterceptor)
             .connectTimeout(Constants.CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(Constants.READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .writeTimeout(Constants.WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
