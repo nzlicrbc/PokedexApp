@@ -78,4 +78,8 @@ object Constants {
 
     // Görsel ayarları
     const val IMAGE_HARDWARE_ACCELERATION_ENABLED = false
+
+    // Animation süresi
+    const val COLOR_ANIMATION_DURATION_MS = 100
+    const val IMAGE_CROSSFADE_ENABLED = true
 }

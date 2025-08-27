@@ -69,4 +69,9 @@
     <!-- Snackbar -->
     <dimen name="snackbar_padding">16dp</dimen>
 
+    <!-- Pokemon item loading state -->
+    <dimen name="pokemon_item_loading_spacer_height">8dp</dimen>
+    <dimen name="pokemon_item_loading_indicator_size">20dp</dimen>
+    <dimen name="pokemon_item_loading_indicator_stroke">2dp</dimen>
+
 </resources>

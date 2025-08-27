@@ -33,4 +33,10 @@
 
     <string name="force_update_error">Uygulamanın yeni bir sürümü mevcut. Lütfen devam etmek için güncelleyin.</string>
 
+    <!-- Error Mesajları -->
+    <string name="error_invalid_image_url">Invalid image URL</string>
+    <string name="error_extract_color_failed">Could not extract color from image</string>
+    <string name="error_image_load_failed">Failed to load image</string>
+    <string name="error_unknown">Unknown error occurred</string>
+
 </resources>
