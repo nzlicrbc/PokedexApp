@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Pokemon Item -->
+    <dimen name="pokemon_item_corner_radius">16dp</dimen>
+    <dimen name="pokemon_item_elevation">4dp</dimen>
+    <dimen name="pokemon_item_padding">8dp</dimen>
+    <dimen name="pokemon_item_spacer_height">8dp</dimen>
+    <dimen name="pokemon_name_text_size">18sp</dimen>
+
+    <!-- Stat Bar -->
+    <dimen name="stat_bar_vertical_padding">6dp</dimen>
+    <dimen name="stat_name_text_size">12sp</dimen>
+    <dimen name="stat_name_width">35dp</dimen>
+    <dimen name="stat_bar_spacer_width">12dp</dimen>
+    <dimen name="stat_bar_height">24dp</dimen>
+    <dimen name="stat_bar_corner_radius">12dp</dimen>
+    <dimen name="stat_text_end_padding">8dp</dimen>
+    <dimen name="stat_text_spacer_width">8dp</dimen>
+    <dimen name="stat_value_text_size">11sp</dimen>
+
+    <!-- Stat Sheet -->
+    <dimen name="stat_sheet_padding">20dp</dimen>
+    <dimen name="stat_sheet_title_text_size">20sp</dimen>
+    <dimen name="stat_sheet_title_bottom_padding">8dp</dimen>
+    <dimen name="stat_sheet_bottom_spacer">32dp</dimen>
+
+    <!-- Type Badge -->
+    <dimen name="type_badge_horizontal_padding">4dp</dimen>
+    <dimen name="type_badge_width">150dp</dimen>
+    <dimen name="type_badge_corner_radius">24dp</dimen>
+    <dimen name="type_badge_vertical_padding">4dp</dimen>
+    <dimen name="type_badge_text_size">14sp</dimen>
+
+    <!-- Pokemon Detail Screen -->
+    <dimen name="bottom_sheet_hidden_peek_height">0dp</dimen>
+    <dimen name="bottom_sheet_peek_height">200dp</dimen>
+    <dimen name="top_bar_title_text_size">20sp</dimen>
+    <dimen name="pokemon_id_text_size">18sp</dimen>
+    <dimen name="pokemon_image_container_height">200dp</dimen>
+    <dimen name="pokemon_image_container_corner_radius">32dp</dimen>
+    <dimen name="pokemon_detail_image_size">250dp</dimen>
+    <dimen name="pokemon_detail_content_padding">16dp</dimen>
+    <dimen name="pokemon_name_top_spacer">16dp</dimen>
+    <dimen name="pokemon_name_text_size_detail">32sp</dimen>
+    <dimen name="pokemon_types_top_spacer">12dp</dimen>
+    <dimen name="type_badges_spacing">8dp</dimen>
+    <dimen name="type_badges_vertical_padding">8dp</dimen>
+    <dimen name="pokemon_measurements_top_spacer">16dp</dimen>
+    <dimen name="measurement_value_text_size">16sp</dimen>
+    <dimen name="measurement_label_text_size">12sp</dimen>
+    <dimen name="stats_button_top_spacer">24dp</dimen>
+    <dimen name="stats_button_text_size">20sp</dimen>
+
+    <!-- Pokemon List Screen -->
+    <dimen name="pokemon_list_title_text_size">24sp</dimen>
+    <dimen name="pokemon_grid_content_padding">8dp</dimen>
+    <dimen name="pokemon_grid_horizontal_spacing">8dp</dimen>
+    <dimen name="pokemon_grid_vertical_spacing">8dp</dimen>
+    <dimen name="pagination_loading_padding">16dp</dimen>
+    <dimen name="pagination_loading_size">24dp</dimen>
+
+    <!-- Hata ekranları -->
+    <dimen name="error_screen_padding">16dp</dimen>
+    <dimen name="error_screen_spacer_height">16dp</dimen>
+    <dimen name="error_view_padding">16dp</dimen>
+    <dimen name="error_text_bottom_padding">16dp</dimen>
+
+    <!-- Snackbar -->
+    <dimen name="snackbar_padding">16dp</dimen>
+
+    <!-- Pokemon item loading state -->
+    <dimen name="pokemon_item_loading_spacer_height">8dp</dimen>
+    <dimen name="pokemon_item_loading_indicator_size">20dp</dimen>
+    <dimen name="pokemon_item_loading_indicator_stroke">2dp</dimen>
+
+</resources>

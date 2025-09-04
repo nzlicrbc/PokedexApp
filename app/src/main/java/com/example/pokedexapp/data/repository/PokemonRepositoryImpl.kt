@@ -1,19 +1,27 @@
 package com.example.pokedexapp.data.repository
 
-import retrofit2.HttpException
+import android.content.Context
+import com.example.pokedexapp.R
 import com.example.pokedexapp.data.remote.ApiService
 import com.example.pokedexapp.domain.model.Pokemon
 import com.example.pokedexapp.domain.model.PokemonDetail
 import com.example.pokedexapp.domain.model.PokemonStats
 import com.example.pokedexapp.domain.repository.PokemonRepository
+import com.example.pokedexapp.util.Constants
 import com.example.pokedexapp.util.Resource
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
 class PokemonRepositoryImpl @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    @ApplicationContext private val context: Context
 ) : PokemonRepository {
 
     override fun getPokemonList(
@@ -24,26 +32,44 @@ class PokemonRepositoryImpl @Inject constructor(
 
         try {
             val response = apiService.getPokemonList(limit = limit, offset = offset)
-            val pokemonList = response.results.map {pokemonResult ->
-                val id = pokemonResult.getPokemonId()
-                Pokemon(
-                    id = id,
-                    name = pokemonResult.name,
-                    imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png"
-                )
+
+            val pokemonList = coroutineScope {
+                response.results.map { pokemonResult ->
+                    async {
+                        try {
+                            val id = pokemonResult.getPokemonId()
+                            val detailResponse = apiService.getPokemonDetailById(id = id)
+                            Pokemon(
+                                id = id,
+                                name = pokemonResult.name,
+                                imageUrl = "${Constants.POKEMON_SPRITE_BASE_URL}$id.png",
+                                types = detailResponse.types.sortedBy { it.slot }
+                                    .map { it.type.name }
+                            )
+                        } catch (e: Exception) {
+                            val id = pokemonResult.getPokemonId()
+                            Pokemon(
+                                id = id,
+                                name = pokemonResult.name,
+                                imageUrl = "${Constants.POKEMON_SPRITE_BASE_URL}$id.png",
+                                types = emptyList()
+                            )
+                        }
+                    }
+                }.awaitAll()
             }
             emit(Resource.Success(pokemonList))
         } catch (e: HttpException) {
             emit(Resource.Error(
-                message = "Bir hata oluştu: ${e.localizedMessage}"
+                message = "${context.getString(R.string.error_occurred)} ${e.localizedMessage}"
             ))
         } catch (e: IOException) {
             emit(Resource.Error(
-                message = "İnternet bağlantınızı kontrol edin"
+                message = context.getString(R.string.check_internet_connection)
             ))
         } catch (e: Exception) {
             emit(Resource.Error(
-                message = "Beklenmeyen bir hata oluştu: ${e.localizedMessage}"
+                message = "${context.getString(R.string.unexpected_error_occurred)} ${e.localizedMessage}"
             ))
         }
     }
@@ -61,23 +87,26 @@ class PokemonRepositoryImpl @Inject constructor(
                 name = response.name,
                 imageUrl = response.sprites.frontDefault ?: "",
                 types = response.types.sortedBy { it.slot }.map { it.type.name },
-                weight = "${response.weight / 10.0} KG",
-                height = "${response.height / 10.0} M",
+                weight = "${response.weight / Constants.WEIGHT_CONVERSION_FACTOR} ${context.getString(R.string.unit_kg)}",
+                height = "${response.height / Constants.HEIGHT_CONVERSION_FACTOR} ${context.getString(R.string.unit_m)}",
                 stats = mapStats(response.stats)
             )
 
             emit(Resource.Success(pokemonDetail))
         } catch (e: HttpException) {
-            emit(Resource.Error(
-                message = "Pokemon detayları yüklenemedi: ${e.localizedMessage}"
-            ))
+            val errorMessage = if (e.code() == 503) {
+                context.getString(R.string.force_update_error)
+            } else {
+                "${context.getString(R.string.pokemon_details_load_error)} ${e.localizedMessage}"
+            }
+            emit(Resource.Error(message = errorMessage))
         } catch (e: IOException) {
             emit(Resource.Error(
-                message = "İnternet bağlantınızı kontrol edin"
+                message = context.getString(R.string.check_internet_connection)
             ))
         } catch (e: Exception) {
             emit(Resource.Error(
-                message = "Beklenmeyen bir hata oluştu: ${e.localizedMessage}"
+                message = "${context.getString(R.string.unexpected_error_occurred)} ${e.localizedMessage}"
             ))
         }
     }
@@ -86,12 +115,12 @@ class PokemonRepositoryImpl @Inject constructor(
         val statsMap = stats.associate { it.stat.name to it.baseStat }
 
         return PokemonStats(
-            hp = statsMap["hp"] ?: 0,
-            attack = statsMap["attack"] ?: 0,
-            defense = statsMap["defense"] ?: 0,
-            speed = statsMap["speed"] ?: 0,
-            specialAttack = statsMap["special-attack"] ?: 0,
-            specialDefense = statsMap["special-defense"] ?: 0
+            hp = statsMap[Constants.STAT_HP] ?: Constants.DEFAULT_STAT_VALUE,
+            attack = statsMap[Constants.STAT_ATTACK] ?: Constants.DEFAULT_STAT_VALUE,
+            defense = statsMap[Constants.STAT_DEFENSE] ?: Constants.DEFAULT_STAT_VALUE,
+            speed = statsMap[Constants.STAT_SPEED] ?: Constants.DEFAULT_STAT_VALUE,
+            specialAttack = statsMap[Constants.STAT_SPECIAL_ATTACK] ?: Constants.DEFAULT_STAT_VALUE,
+            specialDefense = statsMap[Constants.STAT_SPECIAL_DEFENSE] ?: Constants.DEFAULT_STAT_VALUE
         )
     }
 }

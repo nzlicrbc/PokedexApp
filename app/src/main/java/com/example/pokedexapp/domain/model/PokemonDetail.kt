@@ -1,5 +1,7 @@
 package com.example.pokedexapp.domain.model
 
+import com.example.pokedexapp.util.Constants
+
 data class PokemonDetail(
     val id: Int,
     val name: String,
@@ -17,5 +19,5 @@ data class PokemonStats(
     val speed: Int,
     val specialAttack: Int,
     val specialDefense: Int,
-    val maxStat: Int = 300
+    val maxStat: Int = Constants.MAX_STAT_VALUE
 )

@@ -1,6 +1,7 @@
 package com.example.pokedexapp.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -32,3 +33,27 @@ val Typography = Typography(
     )
     */
 )
+
+fun getTypeColor(type: String): Color {
+    return when(type.lowercase()) {
+        "normal" -> typeNormal
+        "fire" -> typeFire
+        "water" -> typeWater
+        "electric" -> typeElectric
+        "grass" -> typeGrass
+        "ice" -> typeIce
+        "fighting" -> typeFighting
+        "poison" -> typePoison
+        "ground" -> typeGround
+        "flying" -> typeFlying
+        "psychic" -> typePsychic
+        "bug" -> typeBug
+        "rock" -> typeRock
+        "ghost" -> typeGhost
+        "dragon" -> typeDragon
+        "dark" -> typeDark
+        "steel" -> typeSteel
+        "fairy" -> typeFairy
+        else -> typeNormal
+    }
+}

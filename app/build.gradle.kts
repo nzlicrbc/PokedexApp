@@ -21,16 +21,63 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
-        val properties = Properties().apply {
-            load(rootProject.file("local.properties").inputStream())
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.inputStream())
+    }
+
+    fun getProperty(key: String, defaultValue: String = ""): String {
+        return properties.getProperty(key) ?: defaultValue
+    }
+
+    flavorDimensions += "environment"
+    productFlavors {
+        create("development") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+
+            buildConfigField("String", "POKEMON_API_BASE_URL", "\"${getProperty("POKEMON_API_BASE_URL")}\"")
+            buildConfigField("String", "UUID", "\"${getProperty("UUID")}\"")
+            buildConfigField("String", "ENVIRONMENT", "\"development\"")
+
+            resValue("string", "app_name", "PokeDex Dev")
         }
 
-        buildConfigField(
-            type = "String",
-            name = "UUID",
-            value = "\"${properties.getProperty("UUID")}\""
-        )
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+
+            buildConfigField(
+                "String",
+                "POKEMON_API_BASE_URL",
+                "\"${getProperty("POKEMON_API_BASE_URL")}\""
+            )
+            buildConfigField("String", "POKEMON_API_BASE_URL", "\"${getProperty("POKEMON_API_BASE_URL")}\"")
+            buildConfigField("String", "UUID", "\"${getProperty("UUID")}\"")
+            buildConfigField("String", "ENVIRONMENT", "\"staging\"")
+
+            resValue("string", "app_name", "PokeDex Staging")
+        }
+
+        create("production") {
+            dimension = "environment"
+
+            buildConfigField(
+                "String",
+                "POKEMON_API_BASE_URL",
+                "\"${getProperty("POKEMON_API_BASE_URL")}\""
+            )
+            buildConfigField("String", "POKEMON_API_BASE_URL", "\"${getProperty("POKEMON_API_BASE_URL")}\"")
+            buildConfigField("String", "UUID", "\"${getProperty("UUID")}\"")
+            buildConfigField("String", "ENVIRONMENT", "\"production\"")
+
+            resValue("string", "app_name", "PokeDex")
+        }
     }
 
     buildTypes {
@@ -84,4 +131,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.material3)
+    implementation(libs.androidx.palette.ktx)
+    debugImplementation(libs.chucker.library)
+    releaseImplementation(libs.chucker.library.no.op)
 }
